@@ -32,10 +32,42 @@ void printgame(game *newgame)
 }
 
 //=========== GAME MOVES ===========\\
+
+
 //Receives a game
 //Outputs a game with a swipe up
 game *swipeup(game *currgame)
 {
+	int repeat = 0;
+	for (int i = 1; i < currgame->boardsize; i++)
+	{
+		do
+		{
+			repeat = 0;
+
+			for (int j = 0; j < currgame->boardsize; j++)
+			{
+				if (currgame->board[i][j] != 0)
+				{
+					if (currgame->board[i - 1][j] == 0)
+					{
+						repeat = 1;
+						currgame->board[i - 1][j] = currgame->board[i][j];
+						currgame->board[i][j] = 0;
+					}
+					else
+					{
+						if (currgame->board[i + 1][j] == currgame->board[i][j])
+						{
+							repeat = 1;
+							currgame->board[i + 1][j] = currgame->board[i + 1][j] + currgame->board[i][j];
+							currgame->board[i][j] = 0;
+						}
+					}
+				}
+			}
+		} while (repeat);
+	}
 	return currgame;
 }
 
@@ -43,6 +75,36 @@ game *swipeup(game *currgame)
 //Outputs a game with a swipe down
 game *swipedown(game *currgame)
 {
+	int repeat = 0;
+	for (int i = 0; i < currgame->boardsize; i++)
+	{
+		do
+		{
+			repeat = 0;
+
+			for (int j = 0; j < currgame->boardsize; j++)
+			{
+				if (currgame->board[i][j] != 0)
+				{
+					if (currgame->board[i + 1][j] == 0)
+					{
+						repeat = 1;
+						currgame->board[i + 1][j] = currgame->board[i][j];
+						currgame->board[i][j] = 0;
+					}
+					else
+					{
+						if (currgame->board[i + 1][j] == currgame->board[i][j])
+						{
+							repeat = 1;
+							currgame->board[i + 1][j] = currgame->board[i + 1][j] + currgame->board[i][j];
+							currgame->board[i][j] = 0;
+						}
+					}
+				}
+			}
+		} while (repeat);
+	}
 	return currgame;
 }
 
@@ -50,6 +112,36 @@ game *swipedown(game *currgame)
 //Outputs a game with a swipe left
 game *swipeleft(game *currgame)
 {
+	int repeat = 0;
+	for (int i = 0; i < currgame->boardsize; i++)
+	{
+		do
+		{
+			repeat = 0;
+
+			for (int j = 1; j < currgame->boardsize; j++)
+			{
+				if (currgame->board[i][j] != 0)
+				{
+					if (currgame->board[i][j - 1] == 0)
+					{
+						repeat = 1;
+						currgame->board[i][j - 1] = currgame->board[i][j];
+						currgame->board[i][j] = 0;
+					}
+					else
+					{
+						if (currgame->board[i][j - 1] == currgame->board[i][j])
+						{
+							repeat = 1;
+							currgame->board[i][j - 1] = currgame->board[i][j - 1] + currgame->board[i][j];
+							currgame->board[i][j] = 0;
+						}
+					}
+				}
+			}
+		} while (repeat);
+	}
 	return currgame;
 }
 
@@ -57,6 +149,36 @@ game *swipeleft(game *currgame)
 //Outputs a game with a swipe right
 game *swiperight(game *currgame)
 {
+	int repeat = 0;
+	for (int i = 0; i < currgame->boardsize; i++)
+	{
+		do
+		{
+			repeat = 0;
+
+			for (int j = 0; j < currgame->boardsize; j++)
+			{
+				if (currgame->board[i][j] != 0)
+				{
+					if (currgame->board[i][j + 1] == 0)
+					{
+						repeat = 1;
+						currgame->board[i][j + 1] = currgame->board[i][j];
+						currgame->board[i][j] = 0;
+					}
+					else
+					{
+						if (currgame->board[i][j + 1] == currgame->board[i][j])
+						{
+							repeat = 1;
+							currgame->board[i][j + 1] = currgame->board[i][j + 1] + currgame->board[i][j];
+							currgame->board[i][j] = 0;
+						}
+					}
+				}
+			}
+		} while (repeat);
+	}
 	return currgame;
 }
 
@@ -66,9 +188,34 @@ game *swiperight(game *currgame)
 //similar to the square problem from class
 //limit recursion using M (max number of moves) and previously
 //found solutions to speedup the process
-int solvegame(game *newgame)
+int solvegame(game *currgame)
 {
-	printgame(newgame);
+	printgame(currgame);
+
+	int gameloop = 1, command;
+	while (gameloop)
+	{
+		scanf("%d", &command);
+		switch (command)
+		{
+		case 8:
+			currgame = swipeup(currgame);
+			break;
+		case 2:
+			currgame = swipedown(currgame);
+			break;
+		case 4:
+			currgame = swipeleft(currgame);
+			break;
+		case 6:
+			currgame = swiperight(currgame);
+			break;
+		default:
+			gameloop = 0;
+			break;
+		}
+		printgame(currgame);
+	}
 	return -1;
 }
 
