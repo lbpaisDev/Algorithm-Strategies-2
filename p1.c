@@ -38,6 +38,7 @@ game *swipeup(game *currgame)
 {
 
 	int repeat = 0;
+
 	do
 	{
 		repeat = 0;
@@ -59,7 +60,6 @@ game *swipeup(game *currgame)
 					{
 						if (currgame->board[i - 1][j] == currgame->board[i][j])
 						{
-							repeat = 1;
 							currgame->board[i - 1][j] = currgame->board[i - 1][j] + currgame->board[i][j];
 							currgame->board[i][j] = 0;
 						}
@@ -97,7 +97,6 @@ game *swipedown(game *currgame)
 					{
 						if (currgame->board[i + 1][j] == currgame->board[i][j])
 						{
-							repeat = 1;
 							currgame->board[i + 1][j] = currgame->board[i + 1][j] + currgame->board[i][j];
 							currgame->board[i][j] = 0;
 						}
@@ -134,7 +133,6 @@ game *swipeleft(game *currgame)
 					{
 						if (currgame->board[i][j - 1] == currgame->board[i][j])
 						{
-							repeat = 1;
 							currgame->board[i][j - 1] = currgame->board[i][j - 1] + currgame->board[i][j];
 							currgame->board[i][j] = 0;
 						}
@@ -171,7 +169,6 @@ game *swiperight(game *currgame)
 					{
 						if (currgame->board[i][j + 1] == currgame->board[i][j])
 						{
-							repeat = 1; // se há merge não há repeat
 							currgame->board[i][j + 1] = currgame->board[i][j + 1] + currgame->board[i][j];
 							currgame->board[i][j] = 0;
 						}
