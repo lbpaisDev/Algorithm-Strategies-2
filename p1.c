@@ -32,18 +32,18 @@ void printgame(game *newgame)
 }
 
 //=========== GAME MOVES ===========\\
-
-
 //Receives a game
 //Outputs a game with a swipe up
 game *swipeup(game *currgame)
 {
+
 	int repeat = 0;
-	for (int i = 1; i < currgame->boardsize; i++)
+	do
 	{
-		do
+		repeat = 0;
+
+		for (int i = 1; i < currgame->boardsize; i++)
 		{
-			repeat = 0;
 
 			for (int j = 0; j < currgame->boardsize; j++)
 			{
@@ -66,8 +66,8 @@ game *swipeup(game *currgame)
 					}
 				}
 			}
-		} while (repeat);
-	}
+		}
+	} while (repeat);
 	return currgame;
 }
 
@@ -76,11 +76,12 @@ game *swipeup(game *currgame)
 game *swipedown(game *currgame)
 {
 	int repeat = 0;
-	for (int i = 0; i < currgame->boardsize; i++)
+
+	do
 	{
-		do
+		repeat = 0;
+		for (int i = 0; i < currgame->boardsize - 1; i++)
 		{
-			repeat = 0;
 
 			for (int j = 0; j < currgame->boardsize; j++)
 			{
@@ -103,8 +104,8 @@ game *swipedown(game *currgame)
 					}
 				}
 			}
-		} while (repeat);
-	}
+		}
+	} while (repeat);
 	return currgame;
 }
 
@@ -156,7 +157,7 @@ game *swiperight(game *currgame)
 		{
 			repeat = 0;
 
-			for (int j = 0; j < currgame->boardsize; j++)
+			for (int j = 0; j < currgame->boardsize - 1; j++)
 			{
 				if (currgame->board[i][j] != 0)
 				{
@@ -191,9 +192,9 @@ game *swiperight(game *currgame)
 int solvegame(game *currgame)
 {
 	printgame(currgame);
-	
-  int gameloop = 1;
-  int command;
+
+	int gameloop = 1;
+	int command;
 	while (gameloop)
 	{
 		scanf("%d", &command);
