@@ -69,6 +69,7 @@ void swipeup(game *currgame)
 			}
 	  }
 	} while (repeat);
+  return currgame;
 }
 
 //Receives a game
@@ -103,6 +104,7 @@ void swipedown(game *currgame)
 			}
 	  }
   } while (repeat);
+  return currgame;
 }
 
 //Receives a game
@@ -138,6 +140,7 @@ void swipeleft(game *currgame)
 			}
 		} while (repeat);
 	}
+  return currgame;
 }
 
 //Receives a game
@@ -173,6 +176,7 @@ void swiperight(game *currgame)
 			}
 		} while (repeat);
 	}
+  return currgame;
 }
 
 int check_sol(game *currgame)
@@ -290,9 +294,10 @@ void getInput()
     newgame->sum = sum;
     newgame->sol_moves = 0;
 
+    printgame(newgame);
 		//Solve board
 		solvegame(newgame, 0, 0);
-
+    printgame(newgame);
 		//Print solution accordinglly
 		if (newgame->sol_moves ==  0)
 		{
