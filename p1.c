@@ -57,10 +57,10 @@ game *swipeup(game *currgame)
 					}
 					else
 					{
-						if (currgame->board[i + 1][j] == currgame->board[i][j])
+						if (currgame->board[i - 1][j] == currgame->board[i][j])
 						{
 							repeat = 1;
-							currgame->board[i + 1][j] = currgame->board[i + 1][j] + currgame->board[i][j];
+							currgame->board[i - 1][j] = currgame->board[i - 1][j] + currgame->board[i][j];
 							currgame->board[i][j] = 0;
 						}
 					}
@@ -170,7 +170,7 @@ game *swiperight(game *currgame)
 					{
 						if (currgame->board[i][j + 1] == currgame->board[i][j])
 						{
-							repeat = 1;
+							repeat = 1; // se há merge não há repeat
 							currgame->board[i][j + 1] = currgame->board[i][j + 1] + currgame->board[i][j];
 							currgame->board[i][j] = 0;
 						}
@@ -191,8 +191,9 @@ game *swiperight(game *currgame)
 int solvegame(game *currgame)
 {
 	printgame(currgame);
-
-	int gameloop = 1, command;
+	
+  int gameloop = 1;
+  int command;
 	while (gameloop)
 	{
 		scanf("%d", &command);
