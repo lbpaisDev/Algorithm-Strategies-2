@@ -9,9 +9,11 @@
 //board size, max moves and respective board.
 typedef struct
 {
-	int boardsize;
-	int maxmoves;
 	int **board;
+	int boardsize;
+  int sum;
+	int maxmoves;
+  int sol_moves;
 } game;
 
 //Print game
@@ -28,7 +30,7 @@ void printgame(game *newgame)
 		}
 		printf("\n");
 	}
-	printf("    =====END OF CURRENT GAME=====\n");
+	printf("\t=====END OF CURRENT GAME=====\n");
 }
 
 //=========== GAME MOVES ===========\\
@@ -36,15 +38,15 @@ void printgame(game *newgame)
 
 //Receives a game
 //Outputs a game with a swipe up
-game *swipeup(game *currgame)
+void swipeup(game *currgame)
 {
 	int repeat = 0;
-	for (int i = 1; i < currgame->boardsize; i++)
+	do
 	{
-		do
-		{
-			repeat = 0;
+		repeat = 0;
 
+	  for (int i = 1; i < currgame->boardsize; i++)
+	  {
 			for (int j = 0; j < currgame->boardsize; j++)
 			{
 				if (currgame->board[i][j] != 0)
@@ -59,29 +61,26 @@ game *swipeup(game *currgame)
 					{
 						if (currgame->board[i - 1][j] == currgame->board[i][j])
 						{
-							repeat = 1;
 							currgame->board[i - 1][j] = currgame->board[i - 1][j] + currgame->board[i][j];
 							currgame->board[i][j] = 0;
 						}
 					}
 				}
 			}
-		} while (repeat);
-	}
-	return currgame;
+	  }
+	} while (repeat);
 }
 
 //Receives a game
 //Outputs a game with a swipe down
-game *swipedown(game *currgame)
+void swipedown(game *currgame)
 {
 	int repeat = 0;
-	for (int i = 0; i < currgame->boardsize; i++)
+	do
 	{
-		do
-		{
-			repeat = 0;
-
+		repeat = 0;
+	  for (int i = 1; i < currgame->boardsize - 1; i++)
+	  {
 			for (int j = 0; j < currgame->boardsize; j++)
 			{
 				if (currgame->board[i][j] != 0)
@@ -96,21 +95,19 @@ game *swipedown(game *currgame)
 					{
 						if (currgame->board[i + 1][j] == currgame->board[i][j])
 						{
-							repeat = 1;
 							currgame->board[i + 1][j] = currgame->board[i + 1][j] + currgame->board[i][j];
 							currgame->board[i][j] = 0;
 						}
 					}
 				}
 			}
-		} while (repeat);
-	}
-	return currgame;
+	  }
+  } while (repeat);
 }
 
 //Receives a game
 //Outputs a game with a swipe left
-game *swipeleft(game *currgame)
+void swipeleft(game *currgame)
 {
 	int repeat = 0;
 	for (int i = 0; i < currgame->boardsize; i++)
@@ -133,7 +130,6 @@ game *swipeleft(game *currgame)
 					{
 						if (currgame->board[i][j - 1] == currgame->board[i][j])
 						{
-							repeat = 1;
 							currgame->board[i][j - 1] = currgame->board[i][j - 1] + currgame->board[i][j];
 							currgame->board[i][j] = 0;
 						}
@@ -142,12 +138,11 @@ game *swipeleft(game *currgame)
 			}
 		} while (repeat);
 	}
-	return currgame;
 }
 
 //Receives a game
 //Outputs a game with a swipe right
-game *swiperight(game *currgame)
+void swiperight(game *currgame)
 {
 	int repeat = 0;
 	for (int i = 0; i < currgame->boardsize; i++)
@@ -156,7 +151,7 @@ game *swiperight(game *currgame)
 		{
 			repeat = 0;
 
-			for (int j = 0; j < currgame->boardsize; j++)
+			for (int j = 0; j < currgame->boardsize - 1; j++)
 			{
 				if (currgame->board[i][j] != 0)
 				{
@@ -170,7 +165,6 @@ game *swiperight(game *currgame)
 					{
 						if (currgame->board[i][j + 1] == currgame->board[i][j])
 						{
-							repeat = 1; // se há merge não há repeat
 							currgame->board[i][j + 1] = currgame->board[i][j + 1] + currgame->board[i][j];
 							currgame->board[i][j] = 0;
 						}
@@ -179,7 +173,22 @@ game *swiperight(game *currgame)
 			}
 		} while (repeat);
 	}
-	return currgame;
+}
+
+int check_sol(game *currgame)
+{
+  for(int i = 0; i < currgame->boardsize; i++)
+  {
+    for(int j = 0; j < currgame->boardsize; j++)
+    {
+      if(currgame->board[i][j] == currgame->sum)
+      {
+        return 1;
+      }
+    }
+  }
+
+  return 0;
 }
 
 //=========== SOLVEGAME ===========\\
@@ -188,36 +197,41 @@ game *swiperight(game *currgame)
 //similar to the square problem from class
 //limit recursion using M (max number of moves) and previously
 //found solutions to speedup the process
-int solvegame(game *currgame)
+void solvegame(game *currgame, int swipe, int depth)
 {
-	printgame(currgame);
-	
-  int gameloop = 1;
-  int command;
-	while (gameloop)
-	{
-		scanf("%d", &command);
-		switch (command)
-		{
-		case 8:
-			currgame = swipeup(currgame);
-			break;
-		case 2:
-			currgame = swipedown(currgame);
-			break;
-		case 4:
-			currgame = swipeleft(currgame);
-			break;
-		case 6:
-			currgame = swiperight(currgame);
-			break;
-		default:
-			gameloop = 0;
-			break;
-		}
-		printgame(currgame);
-	}
-	return -1;
+  if((currgame->sol_moves > 0 && depth == currgame->maxmoves) || depth > currgame->maxmoves)
+  {
+    return;
+  }
+  
+  switch(swipe)
+  {
+    case 1:
+      swipeup(currgame);
+      break;
+    case 2:
+      swiperight(currgame);
+      break;
+    case 3:
+      swipedown(currgame);
+      break;
+    case 4:
+      swipeleft(currgame);
+      break;
+    default:
+      break;
+  }
+
+  if(check_sol(currgame) == 1)
+  {
+    currgame->sol_moves = depth;
+    return;
+  }
+
+  solvegame(currgame, 1, depth+1);
+  solvegame(currgame, 2, depth+1);
+  solvegame(currgame, 3, depth+1);
+  solvegame(currgame, 4, depth+1);
 }
 
 //=========== GETINPUT ===========\\
@@ -225,7 +239,7 @@ int solvegame(game *currgame)
 void getInput()
 {
 	//Local variables
-	int ntests, solution;
+	int ntests, tile_val, sum;
 	char *token, *line;
 	game *newgame;
 
@@ -248,35 +262,45 @@ void getInput()
 		for (int l = 0; l < newgame->boardsize; l++)
 			newgame->board[l] = (int *)malloc(newgame->boardsize * sizeof(int));
 
+    sum = 0;
+
 		//Parse each new line into its columns and store respective values
 		for (int j = 0; j < newgame->boardsize; j++)
 		{
 			//Get line
 			fgets(line, sizeof(char) * (newgame->boardsize * 2 + 1), stdin);
-
 			//Line tokenizer
 			token = strtok(line, " ");
 			for (int k = 0; token != NULL; k++)
 			{
+        tile_val = atoi(token);
+
 				//Each token is a number in the board
 				//If board is 0 slot is empty
-				newgame->board[j][k] = atoi(token);
+				newgame->board[j][k] = tile_val;
+        
+				// sum to check if solution was achieved
+        sum += tile_val;
 
-				//Next token
+        //Next token
 				token = strtok(NULL, " ");
 			}
 		}
 
+    newgame->sum = sum;
+    newgame->sol_moves = 0;
+
 		//Solve board
-		solution = solvegame(newgame);
+		solvegame(newgame, 0, 0);
+
 		//Print solution accordinglly
-		if (solution < 0)
+		if (newgame->sol_moves ==  0)
 		{
 			printf("no solution\n");
 		}
 		else
 		{
-			printf("%d\n", solution);
+			printf("%d\n", newgame->sol_moves);
 		}
 	}
 

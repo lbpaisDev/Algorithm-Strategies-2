@@ -1,8 +1,5 @@
-p1: p1.o
-	gcc -std=c11 -Wall -Wextra -O2 p1.o -lm -o p1
-
-p1.o: p1.c
-	gcc -c p1.c
+p1: p1.c
+	gcc -std=c11 -g -Wall -Wextra -O0 "p1.c" -lm -o p1
 
 clean: 
-	rm *.o p1
+	rm p1
