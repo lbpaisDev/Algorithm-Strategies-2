@@ -15,6 +15,7 @@ typedef struct
 } game;
 
 //Print game
+//For debug purposes
 void printgame(game *newgame)
 {
 	printf("\n\t=====CURRENT GAME=====\n");
@@ -112,35 +113,45 @@ game *swipedown(game *currgame)
 //Outputs a game with a swipe left
 game *swipeleft(game *currgame)
 {
-	int repeat = 0;
 	for (int i = 0; i < currgame->boardsize; i++)
 	{
-		do
+		for (int j = 0; j < currgame->boardsize; j++)
 		{
-			repeat = 0;
-
-			for (int j = 1; j < currgame->boardsize; j++)
+			if (currgame->board[i][j] != 0)
 			{
-				if (currgame->board[i][j] != 0)
+				for (int k = j + 1; k < currgame->boardsize; k++)
 				{
-					if (currgame->board[i][j - 1] == 0)
+					if (currgame->board[i][j] == currgame->board[i][k])
 					{
-						repeat = 1;
-						currgame->board[i][j - 1] = currgame->board[i][j];
-						currgame->board[i][j] = 0;
-					}
-					else
-					{
-						if (currgame->board[i][j - 1] == currgame->board[i][j])
-						{
-							currgame->board[i][j - 1] = currgame->board[i][j - 1] + currgame->board[i][j];
-							currgame->board[i][j] = 0;
-						}
+						currgame->board[i][j] += currgame->board[i][k];
+						currgame->board[i][k] = 0;
+
+						break;
 					}
 				}
 			}
-		} while (repeat);
+		}
 	}
+
+	for (int i = 0; i < currgame->boardsize; i++)
+	{
+		for (int j = 0; j < currgame->boardsize; j++)
+		{
+			if (currgame->board[i][j] == 0)
+			{
+				for (int k = j + 1; k < currgame->boardsize; k++)
+				{
+					if (currgame->board[i][k] != 0)
+					{
+						currgame->board[i][j] = currgame->board[i][k];
+						currgame->board[i][k] = 0;
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	return currgame;
 }
 
@@ -148,36 +159,45 @@ game *swipeleft(game *currgame)
 //Outputs a game with a swipe right
 game *swiperight(game *currgame)
 {
-	int repeat = 0;
+
 	for (int i = 0; i < currgame->boardsize; i++)
 	{
-		do
+		for (int j = currgame->boardsize; j > 1; j--)
 		{
-			repeat = 0;
-
-			for (int j = 0; j < currgame->boardsize - 1; j++)
+			if (currgame->board[i][j] != 0)
 			{
-				if (currgame->board[i][j] != 0)
+				for (int k = j - 1; k > 1; k--)
 				{
-					if (currgame->board[i][j + 1] == 0)
+					if (currgame->board[i][j] == currgame->board[i][k])
 					{
-						repeat = 1;
-						currgame->board[i][j + 1] = currgame->board[i][j];
-						currgame->board[i][j] = 0;
-					}
-					else
-					{
-						if (currgame->board[i][j + 1] == currgame->board[i][j])
-						{
-							currgame->board[i][j + 1] = currgame->board[i][j + 1] + currgame->board[i][j];
-							currgame->board[i][j] = 0;
-						}
+						currgame->board[i][j] += currgame->board[i][k];
+						currgame->board[i][k] = 0;
+
+						break;
 					}
 				}
 			}
-		} while (repeat);
+		}
 	}
-	return currgame;
+
+	for (int i = 0; i < currgame->boardsize; i++)
+	{
+		for (int j = currgame->boardsize; j > 1; j--)
+		{
+			if (currgame->board[i][j] == 0)
+			{
+				for (int k = j - 1; k > 1; k--)
+				{
+					if (currgame->board[i][k] != 0)
+					{
+						currgame->board[i][j] = currgame->board[i][k];
+						currgame->board[i][k] = 0;
+						break;
+					}
+				}
+			}
+		}
+	}
 }
 
 //=========== SOLVEGAME ===========\\
@@ -192,6 +212,7 @@ int solvegame(game *currgame)
 
 	int gameloop = 1;
 	int command;
+
 	while (gameloop)
 	{
 		scanf("%d", &command);
