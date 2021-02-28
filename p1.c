@@ -2,11 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
-//=========== STRUCTURES ===========\\
+/*//=========== STRUCTURES ===========\\
 //Define a single game. Each game has
 //board size, max moves, sum of tile values and solution moves (no solution if sol_moves = 0).
+*/
 typedef struct
 {
 	int boardsize;
@@ -33,9 +34,10 @@ void printgame(game *newgame, int currboard[])
 	printf("\t=====END OF CURRENT GAME=====\n\n");
 }
 
-//=========== GAME MOVES ===========\\
+/*//=========== GAME MOVES ===========\\
 //Receives a game
 //Outputs a game with a swipe up
+*/
 void swipeup(int board[], int boardsize)
 {
 	int repeat = 0;
@@ -185,14 +187,13 @@ void swiperight(int board[], int boardsize)
 					repeat += 1;
 				}
 				board[repeat - 1] += board[i];
-				board[i] -= board[i];
+				board[i] = 0;
 
-				if (board[repeat - 1] == board[repeat] && hasmerged[repeat] == 0)
+				if (board[repeat + boardsize - 1] == board[repeat + boardsize] && hasmerged[repeat + boardsize] == 0)
 				{
-
-					board[repeat] += board[repeat - 1];
-					board[repeat - 1] = 0;
-					hasmerged[repeat] += 1;
+					board[repeat + boardsize] += board[repeat + boardsize - 1];
+					board[repeat + boardsize - 1] = 0;
+					hasmerged[repeat + boardsize] += 1;
 				}
 			}
 			else if (board[i + 1] == board[i] && hasmerged[i - 1] == 0)
@@ -225,15 +226,18 @@ void copy_currboard(int newboard[], int board[], int boardsize)
 	}
 }
 
-//=========== SOLVEGAME ===========\\
+/*//=========== SOLVEGAME ===========\\
 //Function that actually solves the game
 //similar to the square problem from class
 //limit recursion using M (max number of moves) and previously
 //found solutions to speedup the process
+*/
 void solvegame(game *newgame, int board[], int swipe, int depth)
 {
 	if (DEBUG)
 	{
+		swipe--;
+		depth--;
 		printgame(newgame, board);
 
 		int gameloop = 1;
@@ -263,7 +267,7 @@ void solvegame(game *newgame, int board[], int swipe, int depth)
 			printgame(newgame, board);
 		}
 	}
-	/*
+
 	if ((newgame->sol_moves > 0 && depth == newgame->maxmoves) || depth > newgame->maxmoves)
 	{
 		return;
@@ -300,11 +304,11 @@ void solvegame(game *newgame, int board[], int swipe, int depth)
 	solvegame(newgame, currboard, 2, depth + 1);
 	solvegame(newgame, currboard, 3, depth + 1);
 	solvegame(newgame, currboard, 4, depth + 1);
-*/
 }
 
-//=========== GETINPUT ===========\\
+/*//=========== GETINPUT ===========\\
 //Function that reads the input from stdin and calls solve game for each board
+*/
 void getInput()
 {
 	//Local variables
