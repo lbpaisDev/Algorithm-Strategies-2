@@ -40,56 +40,56 @@ void printgame(game *newgame)
 //Outputs a game with a swipe up
 void swipeup(game *currgame)
 {
-	int repeat;
-	do
+	int repeat = 0;
+	for (int i = currgame->boardsize; i < currgame->boardsize * currgame->boardsize; i++)
 	{
-		repeat = 0;
-	  for (int i = currgame->boardsize; i < currgame->boardsize * currgame->boardsize; i++)
-	  {
-			if(currgame->board[i] != 0)
+	  if(currgame->board[i] != 0)
+    {
+      if(currgame->board[i-currgame->boardsize] == 0)
       {
-        if(currgame->board[i-currgame->boardsize] == 0)
+        repeat = i-currgame->boardsize*2;
+        while(repeat > 0 && currgame->board[repeat] == 0)
         {
-          repeat = 1;
-          currgame->board[i-currgame->boardsize] = currgame->board[i];
-          currgame->board[i] = 0;
+          repeat -= currgame->boardsize;
         }
-        else if(currgame->board[i-currgame->boardsize] == currgame->board[i])
-        {
-          currgame->board[i-currgame->boardsize] += currgame->board[i];
-          currgame->board[i] = 0;
-        }
+        currgame->board[repeat+currgame->boardsize] += currgame->board[i];
+        currgame->board[i] = 0;
       }
-	  }
-	} while (repeat);
+      else if(currgame->board[i-currgame->boardsize] == currgame->board[i])
+      {
+        currgame->board[i-currgame->boardsize] += currgame->board[i];
+        currgame->board[i] = 0;
+      }
+    }
+	}
 }
 
 //Receives a game
 //Outputs a game with a swipe down
 void swipedown(game *currgame)
 {
-	int repeat;
-	do
+	int repeat = 0;
+	for (int i = currgame->boardsize * currgame->boardsize - currgame->boardsize - 1; i > -1; i--)
 	{
-		repeat = 0;
-	  for (int i = currgame->boardsize * currgame->boardsize - currgame->boardsize - 1; i > -1; i--)
-	  {
-			if(currgame->board[i] != 0)
+	  if(currgame->board[i] != 0)
+    {
+      if(currgame->board[i+currgame->boardsize] == 0)
       {
-        if(currgame->board[i+currgame->boardsize] == 0)
+        repeat = i+currgame->boardsize*2;
+        while(repeat < currgame->boardsize*currgame->boardsize && currgame->board[repeat] == 0)
         {
-          repeat = 1;
-          currgame->board[i+currgame->boardsize] = currgame->board[i];
-          currgame->board[i] = 0;
+          repeat += currgame->boardsize;
         }
-        else if(currgame->board[i+currgame->boardsize] == currgame->board[i])
-        {
-          currgame->board[i+currgame->boardsize] += currgame->board[i];
-          currgame->board[i] = 0;
-        }
+        currgame->board[repeat-currgame->boardsize] += currgame->board[i];
+        currgame->board[i] = 0;
       }
-	  }
-	} while (repeat);
+      else if(currgame->board[i+currgame->boardsize] == currgame->board[i])
+      {
+        currgame->board[i+currgame->boardsize] += currgame->board[i];
+        currgame->board[i] = 0;
+      }
+    }
+	}
 }
 
 //Receives a game
@@ -97,32 +97,32 @@ void swipedown(game *currgame)
 void swipeleft(game *currgame)
 {
 	int repeat;
-	do
+	for (int i = 1; i < currgame->boardsize * currgame->boardsize; i++)
 	{
-    repeat = 0;
-	  for (int i = 1; i < currgame->boardsize * currgame->boardsize; i++)
-	  {
-      if(i % currgame->boardsize == 0)
-      {
-        i++;
-      }
+    if(i % currgame->boardsize == 0)
+    {
+      i++;
+    }
     
-			if(currgame->board[i] != 0)
+	  if(currgame->board[i] != 0)
+    {
+      if(currgame->board[i-1] == 0)
       {
-        if(currgame->board[i-1] == 0)
+        repeat = i-2;
+        while(repeat % currgame->boardsize != currgame->boardsize-1 && currgame->board[repeat] == 0)
         {
-          repeat = 1;
-          currgame->board[i-1] = currgame->board[i];
-          currgame->board[i] = 0;
+          repeat -= 1;
         }
-        else if(currgame->board[i-1] == currgame->board[i])
-        {
-          currgame->board[i-1] += currgame->board[i];
-          currgame->board[i] = 0;
-        }
+        currgame->board[repeat+1] += currgame->board[i];
+        currgame->board[i] = 0;
       }
-	  }
-	} while (repeat);
+      else if(currgame->board[i-1] == currgame->board[i])
+      {
+        currgame->board[i-1] += currgame->board[i];
+        currgame->board[i] = 0;
+      }
+    }
+	}
 }
 
 //Receives a game
@@ -130,32 +130,32 @@ void swipeleft(game *currgame)
 void swiperight(game *currgame)
 {
 	int repeat = 0;
-	do
+	for (int i = currgame->boardsize - 2; i < currgame->boardsize * currgame->boardsize - 1; i--)
 	{
-    repeat = 0;
-	  for (int i = currgame->boardsize - 2; i < currgame->boardsize * currgame->boardsize - 1; i--)
-	  {
-      if(i % currgame->boardsize == 0)
+    if(i % currgame->boardsize == 0)
+    {
+      i += currgame->boardsize * 2 - 2;
+    }
+
+	  if(currgame->board[i] != 0)
+    {
+      if(currgame->board[i+1] == 0)
       {
-        i += currgame->boardsize * 2 - 2;
+        repeat = i+2;
+        while(repeat % currgame->boardsize != 0 && currgame->board[repeat] == 0)
+        {
+          repeat += 1;
+        }
+        currgame->board[repeat-1] += currgame->board[i];
+        currgame->board[i] = 0;
       }
-    
-			if(currgame->board[i] != 0)
+      else if(currgame->board[i+1] == currgame->board[i])
       {
-        if(currgame->board[i+1] == 0)
-        {
-          repeat = 1;
-          currgame->board[i+1] = currgame->board[i];
-          currgame->board[i] = 0;
-        }
-        else if(currgame->board[i+1] == currgame->board[i])
-        {
-          currgame->board[i-1] += currgame->board[i];
-          currgame->board[i] = 0;
-        }
+        currgame->board[i-1] += currgame->board[i];
+        currgame->board[i] = 0;
       }
-	  }
-	} while (repeat);
+    }
+	}
 }
 
 int check_sol(game *currgame)
