@@ -6,24 +6,23 @@
 
 //=========== STRUCTURES ===========\\
 //Define a single game. Each game has
-//board size, max moves and respective board.
+//board size, max moves, sum of tile values and solution moves (no solution if sol_moves = 0).
 typedef struct
 {
 	int boardsize;
-	int *board;
   int sum;
 	int maxmoves;
   int sol_moves;
 } game;
 
 //Print game
-void printgame(game *newgame)
+void printgame(game *newgame, int currboard[])
 {
 	printf("\n\t=====CURRENT GAME=====\n");
 	printf("   Board Size: %d\t Max moves: %d\n", newgame->boardsize, newgame->maxmoves);
 	for (int i = 0; i < newgame->boardsize * newgame->boardsize; i++)
 	{
-			printf("\t%d", newgame->board[i]);
+			printf("\t%d", currboard[i]);
 			printf(" ");
 
       if((i+1) % newgame->boardsize == 0)
@@ -31,34 +30,34 @@ void printgame(game *newgame)
 		    printf("\n");
       }
 	}
-	printf("\t=====END OF CURRENT GAME=====\n");
+	printf("\t=====END OF CURRENT GAME=====\n\n");
 }
 
 //=========== GAME MOVES ===========\\
 
 //Receives a game
 //Outputs a game with a swipe up
-void swipeup(game *currgame)
+void swipeup(int board[], int boardsize)
 {
 	int repeat = 0;
-	for (int i = currgame->boardsize; i < currgame->boardsize * currgame->boardsize; i++)
+	for (int i = boardsize; i < boardsize*boardsize; i++)
 	{
-	  if(currgame->board[i] != 0)
+	  if(board[i] != 0)
     {
-      if(currgame->board[i-currgame->boardsize] == 0)
+      if(board[i-boardsize] == 0)
       {
-        repeat = i-currgame->boardsize*2;
-        while(repeat > 0 && currgame->board[repeat] == 0)
+        repeat = i-boardsize*2;
+        while(repeat > -1 && board[repeat] == 0)
         {
-          repeat -= currgame->boardsize;
+          repeat -= boardsize;
         }
-        currgame->board[repeat+currgame->boardsize] += currgame->board[i];
-        currgame->board[i] = 0;
+        board[repeat+boardsize] += board[i];
+        board[i] = 0;
       }
-      else if(currgame->board[i-currgame->boardsize] == currgame->board[i])
+      else if(board[i-boardsize] == board[i])
       {
-        currgame->board[i-currgame->boardsize] += currgame->board[i];
-        currgame->board[i] = 0;
+        board[i-boardsize] += board[i];
+        board[i] = 0;
       }
     }
 	}
@@ -66,27 +65,27 @@ void swipeup(game *currgame)
 
 //Receives a game
 //Outputs a game with a swipe down
-void swipedown(game *currgame)
+void swipedown(int board[], int boardsize)
 {
 	int repeat = 0;
-	for (int i = currgame->boardsize * currgame->boardsize - currgame->boardsize - 1; i > -1; i--)
+	for (int i = boardsize*boardsize - boardsize-1; i > -1; i--)
 	{
-	  if(currgame->board[i] != 0)
+	  if(board[i] != 0)
     {
-      if(currgame->board[i+currgame->boardsize] == 0)
+      if(board[i+boardsize] == 0)
       {
-        repeat = i+currgame->boardsize*2;
-        while(repeat < currgame->boardsize*currgame->boardsize && currgame->board[repeat] == 0)
+        repeat = i+boardsize*2;
+        while(repeat < boardsize*boardsize && board[repeat] == 0)
         {
-          repeat += currgame->boardsize;
+          repeat += boardsize;
         }
-        currgame->board[repeat-currgame->boardsize] += currgame->board[i];
-        currgame->board[i] = 0;
+        board[repeat-boardsize] += board[i];
+        board[i] = 0;
       }
-      else if(currgame->board[i+currgame->boardsize] == currgame->board[i])
+      else if(board[i+boardsize] == board[i])
       {
-        currgame->board[i+currgame->boardsize] += currgame->board[i];
-        currgame->board[i] = 0;
+        board[i+boardsize] += board[i];
+        board[i] = 0;
       }
     }
 	}
@@ -94,32 +93,32 @@ void swipedown(game *currgame)
 
 //Receives a game
 //Outputs a game with a swipe left
-void swipeleft(game *currgame)
+void swipeleft(int board[], int boardsize)
 {
 	int repeat;
-	for (int i = 1; i < currgame->boardsize * currgame->boardsize; i++)
+	for (int i = 1; i < boardsize*boardsize; i++)
 	{
-    if(i % currgame->boardsize == 0)
+    if(i % boardsize == 0)
     {
       i++;
     }
     
-	  if(currgame->board[i] != 0)
+	  if(board[i] != 0)
     {
-      if(currgame->board[i-1] == 0)
+      if(board[i-1] == 0)
       {
         repeat = i-2;
-        while(repeat % currgame->boardsize != currgame->boardsize-1 && currgame->board[repeat] == 0)
+        while(repeat % boardsize != boardsize-1 && board[repeat] == 0)
         {
           repeat -= 1;
         }
-        currgame->board[repeat+1] += currgame->board[i];
-        currgame->board[i] = 0;
+        board[repeat+1] += board[i];
+        board[i] = 0;
       }
-      else if(currgame->board[i-1] == currgame->board[i])
+      else if(board[i-1] == board[i])
       {
-        currgame->board[i-1] += currgame->board[i];
-        currgame->board[i] = 0;
+        board[i-1] += board[i];
+        board[i] = 0;
       }
     }
 	}
@@ -127,48 +126,55 @@ void swipeleft(game *currgame)
 
 //Receives a game
 //Outputs a game with a swipe right
-void swiperight(game *currgame)
+void swiperight(int board[], int boardsize)
 {
 	int repeat = 0;
-	for (int i = currgame->boardsize - 2; i < currgame->boardsize * currgame->boardsize - 1; i--)
+	for (int i = boardsize - 2; i < boardsize*boardsize - 1; i--)
 	{
-    if(i % currgame->boardsize == 0)
+    if(i % boardsize == boardsize - 1 || i < 0)
     {
-      i += currgame->boardsize * 2 - 2;
+      i += boardsize * 2 - 1;
     }
 
-	  if(currgame->board[i] != 0)
+	  if(board[i] != 0)
     {
-      if(currgame->board[i+1] == 0)
+      if(board[i+1] == 0)
       {
         repeat = i+2;
-        while(repeat % currgame->boardsize != 0 && currgame->board[repeat] == 0)
+        while(repeat % boardsize != 0 && board[repeat] == 0)
         {
           repeat += 1;
         }
-        currgame->board[repeat-1] += currgame->board[i];
-        currgame->board[i] = 0;
+        board[repeat-1] += board[i];
+        board[i] -= board[i];
       }
-      else if(currgame->board[i+1] == currgame->board[i])
+      else if(board[i+1] == board[i])
       {
-        currgame->board[i-1] += currgame->board[i];
-        currgame->board[i] = 0;
+        board[i+1] += board[i];
+        board[i] -= board[i];
       }
     }
 	}
 }
 
-int check_sol(game *currgame)
+int check_sol(int board[], int boardsize, int sum)
 {
-  for(int i = 0; i < currgame->boardsize * currgame->boardsize; i++)
+  for(int i = 0; i < boardsize*boardsize; i++)
   {
-    if(currgame->board[i] == currgame->sum)
+    if(board[i] == sum)
     {
       return 1;
     }
   }
-
   return 0;
+}
+
+void copy_currboard(int newboard[], int board[], int boardsize)
+{
+  for(int i=0; i<boardsize*boardsize; i++)
+  {
+    newboard[i] = board[i];
+  }
 }
 
 //=========== SOLVEGAME ===========\\
@@ -176,41 +182,44 @@ int check_sol(game *currgame)
 //similar to the square problem from class
 //limit recursion using M (max number of moves) and previously
 //found solutions to speedup the process
-void solvegame(game *currgame, int swipe, int depth)
+void solvegame(game *newgame, int board[], int swipe, int depth)
 {
-  if((currgame->sol_moves > 0 && depth == currgame->maxmoves) || depth > currgame->maxmoves)
+  if((newgame->sol_moves > 0 && depth == newgame->maxmoves) || depth > newgame->maxmoves)
   {
     return;
   }
   
+  int currboard[newgame->boardsize*newgame->boardsize];
+  copy_currboard(currboard, board, newgame->boardsize);
+
   switch(swipe)
   {
     case 1:
-      swipeup(currgame);
+      swipeup(currboard, newgame->boardsize);
       break;
     case 2:
-      swiperight(currgame);
+      swiperight(currboard, newgame->boardsize);
       break;
     case 3:
-      swipedown(currgame);
+      swipedown(currboard, newgame->boardsize);
       break;
     case 4:
-      swipeleft(currgame);
+      swipeleft(currboard, newgame->boardsize);
       break;
     default:
       break;
   }
 
-  if(check_sol(currgame) == 1)
+  if(check_sol(currboard, newgame->boardsize, newgame->sum) == 1)
   {
-    currgame->sol_moves = depth;
+    newgame->sol_moves = depth;
     return;
   }
 
-  solvegame(currgame, 1, depth+1);
-  solvegame(currgame, 2, depth+1);
-  solvegame(currgame, 3, depth+1);
-  solvegame(currgame, 4, depth+1);
+  solvegame(newgame, currboard, 1, depth+1);
+  solvegame(newgame, currboard, 2, depth+1);
+  solvegame(newgame, currboard, 3, depth+1);
+  solvegame(newgame, currboard, 4, depth+1);
 }
 
 //=========== GETINPUT ===========\\
@@ -221,35 +230,34 @@ void getInput()
 	int ntests;
 	game *newgame;
 
+  newgame = (game*) malloc(sizeof(game));
+
 	//Get number of tests in a file
 	scanf("%d", &ntests);
 	
-  newgame = (game*) malloc(sizeof(game));
-
 	for (int i = 0; i < ntests; i++)
 	{
     //For each new game get boardsize, maxmoves and board
 		//Allocate space for game board
 		scanf("%d %d", &newgame->boardsize, &newgame->maxmoves);
-		newgame->board = (int *) malloc(newgame->boardsize * newgame->boardsize * sizeof(int));
     newgame->sum = 0;
     newgame->sol_moves = 0;
 
+    int board[newgame->boardsize*newgame->boardsize];
+
 		//Parse each new line into its columns and store respective values
-		for (int j = 0; j < newgame->boardsize * newgame->boardsize; j++)
+		for (int j = 0; j < newgame->boardsize*newgame->boardsize; j++)
 		{
 		  //Each token is a number in the board
 		  //If board is 0 slot is empty
-      scanf("%d", &newgame->board[j]);
+      scanf("%d", &board[j]);
         
 			// sum to check if solution was achieved
-      newgame->sum += newgame->board[j];
+      newgame->sum += board[j];
 		}
 
-    printgame(newgame);
-    
 		//Solve board
-		solvegame(newgame, 0, 0);
+		solvegame(newgame, board, 0, 0);
 
 		//Print solution accordinglly
 		if (newgame->sol_moves ==  0)
@@ -261,12 +269,8 @@ void getInput()
 			printf("%d\n", newgame->sol_moves);
 		}
 	  
-    //Free board
-    free(newgame->board);
 	}
 
-	//Free game structure 
-	free(newgame);
 }
 
 int main()
