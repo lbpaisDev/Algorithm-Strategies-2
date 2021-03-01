@@ -234,41 +234,8 @@ void copy_currboard(int newboard[], int board[], int boardsize)
 */
 void solvegame(game *newgame, int board[], int swipe, int depth)
 {
-	if (DEBUG)
-	{
-		swipe--;
-		depth--;
-		printgame(newgame, board);
 
-		int gameloop = 1;
-		int command;
-
-		while (gameloop)
-		{
-			scanf("%d", &command);
-			switch (command)
-			{
-			case 8:
-				swipeup(board, newgame->boardsize);
-				break;
-			case 2:
-				swipedown(board, newgame->boardsize);
-				break;
-			case 4:
-				swipeleft(board, newgame->boardsize);
-				break;
-			case 6:
-				swiperight(board, newgame->boardsize);
-				break;
-			default:
-				gameloop = 0;
-				break;
-			}
-			printgame(newgame, board);
-		}
-	}
-
-	if ((newgame->sol_moves > 0 && depth == newgame->maxmoves) || depth > newgame->maxmoves)
+	if (depth > newgame->sol_moves)
 	{
 		return;
 	}
@@ -341,11 +308,13 @@ void getInput()
 			newgame->sum += board[j];
 		}
 
+		newgame->sol_moves = newgame->maxmoves + 1;
+
 		//Solve board
 		solvegame(newgame, board, 0, 0);
 
 		//Print solution accordinglly
-		if (newgame->sol_moves == 0)
+		if (newgame->sol_moves == newgame->maxmoves + 1)
 		{
 			printf("no solution\n");
 		}
