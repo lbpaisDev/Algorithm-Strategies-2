@@ -33,9 +33,9 @@ void swipe_up(int curr_board[])
 	int has_merged[board_size * board_size];
 	memset(has_merged, 0, sizeof(int) * board_size * board_size);
 
-  for (int i=0; i<board_size*board_size; i++)
+  for (int i=board_size; i<board_size*board_size; i++)
   {
-    if(i == 0)
+    if(curr_board[i] == 0)
     {
       continue;
     }
@@ -53,7 +53,7 @@ void swipe_up(int curr_board[])
     }
     else if(curr_board[repeat] == curr_board[i] && has_merged[repeat] == 0)
     {
-      curr_board[repeat] = curr_board[i] << 1;
+      curr_board[repeat] = curr_board[i] * 2;
       curr_board[i] = 0;
       has_merged[repeat] = 1;
     }
