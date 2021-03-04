@@ -12,8 +12,8 @@ void print_game(int curr_board[])
 {
 	printf("\n\t=====CURRENT GAME=====\n");
 	printf("   Board Size: %d\t Max moves: %d\n", board_size, max_moves);
-	for (int i = 0; i < board_size*board_size; i++)
-	{
+	for (int i = 0; i < board_size * board_size; i++)
+  {	
 		printf("\t%d", curr_board[i]);
 		printf(" ");
 
@@ -53,7 +53,7 @@ void swipe_up(int curr_board[])
     }
     else if(curr_board[repeat] == curr_board[i] && has_merged[repeat] == 0)
     {
-      curr_board[repeat] = curr_board[i] * 2;
+      curr_board[repeat] = curr_board[i] << 1;
       curr_board[i] = 0;
       has_merged[repeat] = 1;
     }
@@ -194,7 +194,6 @@ void swipe_right(int curr_board[])
     }
   }
 }
-
 int check_sol(int curr_board[])
 {
 	for (int i = 0; i < board_size * board_size; i++)
@@ -226,7 +225,7 @@ void solve_game(int last_board[], int swipe, int depth)
 
 	int curr_board[board_size * board_size];
 	copy_last_board(curr_board, last_board);
-  
+
 	switch (swipe)
 	{
 	case 1:
@@ -292,7 +291,6 @@ void getInput()
 
     num_tests--;
   }
-  
 }
 
 int main()
