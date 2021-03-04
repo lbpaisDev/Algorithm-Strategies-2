@@ -7,7 +7,7 @@ int board_values_sum = 0;
 int max_moves = 0;
 int sol_moves = -1;
 
-/*//Print game
+//Print game
 void print_game(int curr_board[])
 {
 	printf("\n\t=====CURRENT GAME=====\n");
@@ -23,7 +23,7 @@ void print_game(int curr_board[])
 		}
 	}
 	printf("\t=====END OF CURRENT GAME=====\n\n");
-}*/
+}
 
 //Receives a game
 //Outputs a game with a swipe up
@@ -56,6 +56,11 @@ void swipe_up(int curr_board[])
       curr_board[repeat] = curr_board[i] << 1;
       curr_board[i] = 0;
       has_merged[repeat] = 1;
+    }
+    else if(repeat < i-board_size)
+    {
+      curr_board[repeat+board_size] = curr_board[i];
+      curr_board[i] = 0;
     }
   }
 }
@@ -91,6 +96,11 @@ void swipe_down(int curr_board[])
       curr_board[repeat] = curr_board[i] << 1;
       curr_board[i] = 0;
       has_merged[repeat] = 1;
+    }
+    else if(repeat > i+board_size)
+    {
+      curr_board[repeat-board_size] = curr_board[i];
+      curr_board[i] = 0;
     }
   }
 }
@@ -132,6 +142,11 @@ void swipe_left(int curr_board[])
       curr_board[i] = 0;
       has_merged[repeat] = 1;
     }
+    else if(repeat < i-1)
+    {
+      curr_board[repeat+1] = curr_board[i];
+      curr_board[i] = 0;
+    }
   }
 }
 
@@ -172,6 +187,11 @@ void swipe_right(int curr_board[])
       curr_board[i] = 0;
       has_merged[repeat] = 1;
     }
+    else if(repeat > i+1)
+    {
+      curr_board[repeat-1] = curr_board[i];
+      curr_board[i] = 0;
+    }
   }
 }
 
@@ -206,7 +226,7 @@ void solve_game(int last_board[], int swipe, int depth)
 
 	int curr_board[board_size * board_size];
 	copy_last_board(curr_board, last_board);
-
+  
 	switch (swipe)
 	{
 	case 1:
