@@ -2,328 +2,424 @@
 #include <stdio.h>
 #include <string.h>
 
-int board_size = 0;
-int board_values_sum = 0;
-int max_moves = 0;
-int sol_moves = -1;
+//Estrategias Algoritmicas 2020/2021
+//Afonso Magalhães 2016228735
+//Leandro Pais 2017251509
 
-//Print game
-void print_game(int curr_board[])
+int board_size = 0;       // Size of board in a single dimension
+int board_values_sum = 0; // Sum to check if solution was achieved
+int max_moves = 0;        // Max moves possible on a board
+int sol_moves = -1;       // Value of best solution found
+
+//Swipes up the matrix
+int swipe_up(int board[board_size][board_size])
 {
-	printf("\n\t=====CURRENT GAME=====\n");
-	printf("   Board Size: %d\t Max moves: %d\n", board_size, max_moves);
-	for (int i = 0; i < board_size * board_size; i++)
-  {	
-		printf("\t%d", curr_board[i]);
-		printf(" ");
+  int repeat = 0;      //move the values
+  int has_changed = 0; //check if swipe is effective
 
-		if ((i + 1) % board_size == 0)
-		{
-			printf("\n");
-		}
-	}
-	printf("\t=====END OF CURRENT GAME=====\n\n");
-}
+  //Keeps values to check if the tile has already merged
+  int has_merged[board_size][board_size];
+  memset(has_merged, 0, sizeof(int) * board_size * board_size);
 
-//Receives a game
-//Outputs a game with a swipe up
-int swipe_up(int board[])
-{
-	int repeat = 0, num_changes = 0;
-	int has_merged[board_size * board_size];
-	memset(has_merged, 0, sizeof(int) * board_size * board_size);
-
-  for (int i=board_size; i<board_size*board_size; i++)
+  int i, j;
+  //Rows
+  for (i = 1; i < board_size; i++)
   {
-    if(board[i] == 0)
+    //Ccolumns
+    for (j = 0; j < board_size; j++)
     {
-      continue;
-    }
+      //If the value is 0 tile is empty
+      if (board[i][j] == 0)
+      {
+        continue;
+      }
 
-    repeat = i-board_size;
-    while(repeat / board_size > 0 && board[repeat] == 0)
-    {
-      repeat -= board_size;
-    }
-    
-    if(board[repeat] == 0)
-    {
-      board[repeat] = board[i];
-      board[i] = 0;
-      num_changes++;
-    }
-    else if(board[repeat] == board[i] && has_merged[repeat] == 0)
-    {
-      board[repeat] = board[i] << 1;
-      board[i] = 0;
-      has_merged[repeat] = 1;
-      num_changes++;
-    }
-    else if(repeat < i-board_size)
-    {
-      board[repeat+board_size] = board[i];
-      board[i] = 0;
-      num_changes++;
+      //Where the tilves should be moved to
+      repeat = i - 1;
+      while (repeat > 0 && board[repeat][j] == 0)
+      {
+        repeat--;
+      }
+
+      //If target tile is empty just move
+      if (board[repeat][j] == 0)
+      {
+        board[repeat][j] = board[i][j];
+        board[i][j] = 0;
+        has_changed = 1;
+      }
+
+      //If target tile is not empty and the value is the same as the current and the current hasn't merged
+      //Allow merging
+      else if (board[repeat][j] == board[i][j] && has_merged[repeat][j] == 0)
+      {
+        board[repeat][j] = board[i][j] << 1;
+
+        //Check if solution was achieved
+        if (board[repeat][j] == board_values_sum)
+        {
+          return -1;
+        }
+
+        board[i][j] = 0;
+        has_merged[repeat][j] = 1;
+        has_changed = 1;
+      }
+      //Otherwise just move it to the tile before that one that is empty
+      else if (repeat < i - 1)
+      {
+        board[repeat + 1][j] = board[i][j];
+        board[i][j] = 0;
+        has_changed = 1;
+      }
     }
   }
 
-  return num_changes;
+  return has_changed;
 }
 
-//Receives a game
-//Outputs a game with a swipe down
-int swipe_down(int board[])
+//Swipes down the matrix
+int swipe_down(int board[board_size][board_size])
 {
-	int repeat = 0, num_changes = 0;
-	int has_merged[board_size * board_size];
-	memset(has_merged, 0, sizeof(int) * board_size * board_size);
 
-  for(int i = board_size*board_size-board_size-1; i > -1; i--)
+  int repeat = 0;      //move tiles
+  int has_changed = 0; //check if the swipe is effective
+
+  //Keeps information about the tiles when it comes to merging
+  int has_merged[board_size][board_size];
+  memset(has_merged, 0, sizeof(int) * board_size * board_size);
+
+  int i, j;
+  //Rows
+  for (i = board_size - 2; i > -1; i--)
   {
-    if(board[i] == 0)
+    //Columns
+    for (j = 0; j < board_size; j++)
     {
-      continue;
-    }
+      //If tile is 0 is empty and do nothing
+      if (board[i][j] == 0)
+      {
+        continue;
+      }
 
-    repeat = i+board_size;
-    while(repeat / board_size < board_size-1 && board[repeat] == 0)
-    {
-      repeat += board_size;
-    }
+      //Find out where to move the current tile
+      repeat = i + 1;
+      while (repeat < board_size - 1 && board[repeat][j] == 0)
+      {
+        repeat++;
+      }
 
-    if(board[repeat] == 0)
-    {
-      board[repeat] = board[i];
-      board[i] = 0;
-      num_changes++;
-    }
-    else if(board[repeat] == board[i] && has_merged[repeat] == 0)
-    {
-      board[repeat] = board[i] << 1;
-      board[i] = 0;
-      has_merged[repeat] = 1;
-      num_changes++;
-    }
-    else if(repeat > i+board_size)
-    {
-      board[repeat-board_size] = board[i];
-      board[i] = 0;
-      num_changes++;
+      //If target tile is empty just put the current one there
+      if (board[repeat][j] == 0)
+      {
+        board[repeat][j] = board[i][j];
+        board[i][j] = 0;
+        has_changed = 1;
+      }
+
+      //Else if the value is the same of the current and current has not merged
+      //Allow merging
+      else if (board[repeat][j] == board[i][j] && has_merged[repeat][j] == 0)
+      {
+        board[repeat][j] = board[i][j] << 1;
+
+        //Check if a solution is achieved
+        if (board[repeat][j] == board_values_sum)
+        {
+          return -1;
+        }
+
+        board[i][j] = 0;
+        has_merged[repeat][j] = 1;
+        has_changed = 1;
+      }
+
+      //Else just move the nearest empty tile
+      else if (repeat > i + 1)
+      {
+        board[repeat - 1][j] = board[i][j];
+        board[i][j] = 0;
+        has_changed = 1;
+      }
     }
   }
 
-  return num_changes;
+  return has_changed;
 }
 
-//Receives a game
-//Outputs a game with a swipe left
-int swipe_left(int board[])
+//swipes left the matrix
+int swipe_left(int board[board_size][board_size])
 {
-	int repeat = 0, num_changes = 0;
-	int has_merged[board_size * board_size];
-	memset(has_merged, 0, sizeof(int) * board_size * board_size);
+  int repeat = 0;      //move tiles
+  int has_changed = 0; //check if swipe is effective
 
-  for(int i=1; i<board_size*board_size; i++)
+  //Keeps info about the tiles (if one particular tile has merged)
+  int has_merged[board_size][board_size];
+  memset(has_merged, 0, sizeof(int) * board_size * board_size);
+
+  int i, j;
+  //Rows
+  for (i = 0; i < board_size; i++)
   {
-    if(i % board_size == 0)
+    //Columns
+    for (j = 1; j < board_size; j++)
     {
-      i++;
-    }
+      //If tile is zero then its empty do nothing
+      if (board[i][j] == 0)
+      {
+        continue;
+      }
 
-    if(board[i] == 0)
-    {
-      continue;
-    }
+      //Get target tile
+      repeat = j - 1;
+      while (repeat > 0 && board[i][repeat] == 0)
+      {
+        repeat--;
+      }
 
-    repeat = i-1;
-    while(repeat % board_size != 0 && board[repeat] == 0)
-    {
-      repeat--;
-    }
+      //If target tile is empty just move it there
+      if (board[i][repeat] == 0)
+      {
+        board[i][repeat] = board[i][j];
+        board[i][j] = 0;
+        has_changed = 1;
+      }
 
-    if(board[repeat] == 0)
-    {
-      board[repeat] = board[i];
-      board[i] = 0;
-      num_changes++;
-    }
-    else if(board[repeat] == board[i] && has_merged[repeat] == 0)
-    {
-      board[repeat] = board[i] << 1;
-      board[i] = 0;
-      has_merged[repeat] = 1;
-      num_changes++;
-    }
-    else if(repeat < i-1)
-    {
-      board[repeat+1] = board[i];
-      board[i] = 0;
-      num_changes++;
+      //Else if the value is the same as the current and the current has not merged
+      //Allow merging
+      else if (board[i][repeat] == board[i][j] && has_merged[i][repeat] == 0)
+      {
+        board[i][repeat] = board[i][j] << 1;
+
+        //Check if solution was achieved
+        if (board[i][repeat] == board_values_sum)
+        {
+          return -1;
+        }
+
+        board[i][j] = 0;
+        has_merged[i][repeat] = 1;
+        has_changed = 1;
+      }
+
+      //Else just move it to the nearest empty tile
+      else if (repeat < j - 1)
+      {
+        board[i][repeat + 1] = board[i][j];
+        board[i][j] = 0;
+        has_changed = 1;
+      }
     }
   }
 
-  return num_changes;
+  return has_changed;
 }
 
-//Receives a game
-//Outputs a game with a swipe right
-int swipe_right(int board[])
+//swipes right the matrix
+int swipe_right(int board[board_size][board_size])
 {
-	int repeat = 0, num_changes = 0;
-	int has_merged[board_size * board_size];
-	memset(has_merged, 0, sizeof(int) * board_size * board_size);
+  int repeat = 0;      //Move values
+  int has_changed = 0; //check if swipe is effective
 
-  for(int i=board_size*board_size-2; i > -1; i--)
+  //Keeps info about the tile (if it has merged previously in this swipe)
+  int has_merged[board_size][board_size];
+  memset(has_merged, 0, sizeof(int) * board_size * board_size);
+
+  int i, j;
+  //Rows
+  for (i = 0; i < board_size; i++)
   {
-    if(i % board_size == board_size - 1)
+    //Columns
+    for (j = board_size - 2; j > -1; j--)
     {
-      i--;
-    }
+      //If tile is empty do nothing
+      if (board[i][j] == 0)
+      {
+        continue;
+      }
 
-    if(board[i] == 0)
-    {
-      continue;
-    }
+      //Get target tile
+      repeat = j + 1;
+      while (repeat < board_size - 1 && board[i][repeat] == 0)
+      {
+        repeat++;
+      }
 
-    repeat = i+1;
-    while(repeat % board_size != board_size - 1 && board[repeat] == 0)
-    {
-      repeat++;
-    }
+      //If target tile is empty just move the current on there
+      if (board[i][repeat] == 0)
+      {
+        board[i][repeat] = board[i][j];
+        board[i][j] = 0;
+        has_changed = 1;
+      }
 
-    if(board[repeat] == 0)
-    {
-      board[repeat] = board[i];
-      board[i] = 0;
-      num_changes++;
-    }
-    else if(board[repeat] == board[i] && has_merged[repeat] == 0)
-    {
-      board[repeat] = board[i] << 1;
-      board[i] = 0;
-      has_merged[repeat] = 1;
-      num_changes++;
-    }
-    else if(repeat > i+1)
-    {
-      board[repeat-1] = board[i];
-      board[i] = 0;
-      num_changes++;
+      //Else if the values is the same as the current one and current one as not merged
+      //Allow merging
+      else if (board[i][repeat] == board[i][j] && has_merged[i][repeat] == 0)
+      {
+        board[i][repeat] = board[i][j] << 1;
+
+        //Check if solution is achieved
+        if (board[i][repeat] == board_values_sum)
+        {
+          return -1;
+        }
+
+        board[i][j] = 0;
+        has_merged[i][repeat] = 1;
+        has_changed = 1;
+      }
+
+      //Otherwise move it to the nearest empty tile
+      else if (repeat > j + 1)
+      {
+        board[i][repeat - 1] = board[i][j];
+        board[i][j] = 0;
+        has_changed = 1;
+      }
     }
   }
 
-  return num_changes;
-}
-int check_sol(int curr_board[])
-{
-	for (int i = 0; i < board_size * board_size; i++)
-	{
-		if (curr_board[i] == board_values_sum)
-		{
-			return 1;
-		}
-	}
-	return 0;
+  return has_changed;
 }
 
-void copy_prev_board(int curr_board[], int prev_board[])
+//Copy game matrix
+//Important to keep a common board at each recursion level
+void copy_prev_board(int curr_board[board_size][board_size], int prev_board[board_size][board_size])
 {
-	for (int i = 0; i < board_size * board_size; i++)
-	{
-		curr_board[i] = prev_board[i];
-	}
+  //Rows
+  for (int i = 0; i < board_size; i++)
+  {
+    //Columns
+    for (int j = 0; j < board_size; j++)
+    {
+      //Copy
+      curr_board[i][j] = prev_board[i][j];
+    }
+  }
 }
 
 //Function that actually solves the game
 //Backtracking using sol_moves (best solution found) and max_moves (maximum possible moves)
-void solve_game(int prev_board[], int swipe, int depth)
+void solve_game(int board[board_size][board_size], int swipe, int depth)
 {
-	if (depth > max_moves || depth == sol_moves)
-	{
-		return;
-	}
-
-	int curr_board[board_size * board_size];
-  copy_prev_board(curr_board, prev_board);
-
-  int num_changes; // To check if at least one merge occurred in a swipe
-
-	switch (swipe)
-	{
-	case 1:
-		num_changes = swipe_up(curr_board);
-		break;
-	case 2:
-		num_changes = swipe_right(curr_board);
-		break;
-	case 3:
-		num_changes = swipe_down(curr_board);
-		break;
-	case 4:
-		num_changes = swipe_left(curr_board);
-		break;
-	default:
-    num_changes = -1;
-		break;
-	}
-
-  if(num_changes == 0)
+  //best solution implementation
+  if (depth > max_moves || depth == sol_moves)
   {
     return;
   }
 
-  if (check_sol(curr_board) == 1)
-	{
-		sol_moves = depth;
-	}
-  else
+  //Copy board for each recursion level
+  int curr_board[board_size][board_size];
+  copy_prev_board(curr_board, board);
+
+  int has_changed; // To check if at least one merge occurred in a swipe
+
+  //Branching
+  switch (swipe)
   {
-    solve_game(curr_board, 1, depth + 1);
-    solve_game(curr_board, 2, depth + 1);
-    solve_game(curr_board, 3, depth + 1);
-    solve_game(curr_board, 4, depth + 1);
+  case 1:
+    has_changed = swipe_up(curr_board);
+    break;
+  case 2:
+    has_changed = swipe_right(curr_board);
+    break;
+  case 3:
+    has_changed = swipe_down(curr_board);
+    break;
+  case 4:
+    has_changed = swipe_left(curr_board);
+    break;
+  default:
+    has_changed = -2;
+    break;
   }
-}
 
-//Function that reads the input from stdin and calls solve game for each board
-void getInput()
-{
-	int num_tests = 0;
-
-	scanf("%d", &num_tests);
-  
-  while(num_tests > 0)
+  //If board doesn't change just end branch
+  if (has_changed == 0)
   {
-		scanf("%d %d", &board_size, &max_moves);
-		board_values_sum = 0;
-		sol_moves = -1;
-
-		int board[board_size*board_size];
-
-		//Parse each new line into its columns and store respective values
-		for (int j = 0; j < board_size*board_size; j++)
-		{
-			scanf("%d", &board[j]); // Get tile value
-		  board_values_sum += board[j]; // Sum to check if solution was achieved
-		}
-
-		solve_game(board, 0, 0);
-
-		if(sol_moves == -1)
-		{
-			printf("no solution\n");
-		}
-		else
-		{
-			printf("%d\n", sol_moves);
-		}
-
-    num_tests--;
+    return;
   }
+
+  //if solution was found update solmoves
+  if (has_changed == -1)
+  {
+    sol_moves = depth;
+    return;
+  }
+
+  //Recursive calls
+  solve_game(curr_board, 1, depth + 1);
+  solve_game(curr_board, 2, depth + 1);
+  solve_game(curr_board, 3, depth + 1);
+  solve_game(curr_board, 4, depth + 1);
 }
 
 int main()
 {
-	getInput();
-	return 0;
+  //Num tests
+  int num_tests = 0;
+  scanf("%d", &num_tests);
+
+  //Solve number of tests
+  while (num_tests > 0)
+  {
+    //Get board size and max moves from first line
+    scanf("%d %d", &board_size, &max_moves);
+
+    //Reset global params
+    board_values_sum = 0;
+    sol_moves = -1;
+
+    int board[board_size][board_size]; // Board
+    int max = 0;                       // Max value in board
+
+    //Rows
+    for (int i = 0; i < board_size; i++)
+    {
+      //Columns
+      for (int j = 0; j < board_size; j++)
+      {
+        scanf("%d", &board[i][j]); // Get tile value
+
+        if (board[i][j] != 0) // If tile value different than 0, update sum and max vars
+        {
+          board_values_sum += board[i][j];
+
+          //Get max tile value for later pre processing
+          if (board[i][j] > max)
+          {
+            max = board[i][j];
+          }
+        }
+      }
+    }
+
+    //Pre processing if this is the case the board is unsolvable
+    //Recursive call isn't even made
+    if (max > board_values_sum / 2)
+    {
+      printf("no solution\n");
+    }
+
+    //Other wise
+    else
+    {
+      //First call
+      solve_game(board, 0, 0);
+
+      //Check sol_moves set to -1 if there's no solution
+      if (sol_moves == -1)
+      {
+        printf("no solution\n");
+      }
+      else
+      {
+        printf("%d\n", sol_moves);
+      }
+    }
+
+    num_tests--;
+  }
+  return 0;
 }
